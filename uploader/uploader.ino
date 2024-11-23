@@ -24,9 +24,7 @@ int KillSwitchState;
 bool IsLightBarOn = false;
 bool IsBumperLightOn = false;
 
-// TODO: fix it going way faster for the last couple LEDs during startup animation
-
-// TODO: read brightness dial (and light bar dash lights?) while starting up
+// TODO: read light bar dash lights while starting up
 
 // TODO: make more gradients in default mode!
 
@@ -172,8 +170,6 @@ class Dimmer {
       dimmerPin = dp;
     }
 
-    // TODO: figure out why we fade to black between red and pink when dim
-    // TODO: also figure out why this is so slow (do we compute brightness for each pixel individually?)
     void handleState() {
       // Exponential mapping of brightness values
       // dimmerPin should read 0-6 (0 brightest). This function converts that to 255-1 (255 brightest)
@@ -246,12 +242,6 @@ class LED {
         set(WhitePixels[pixel], 255, 255, 255);
       }
     }
-
-    // void setSpeedometerGradientPixels() {
-    //   for(int pixel = 0; pixel < 2; pixel++) {
-    //     set(GradientPixels[pixel], ceil(i/2)+126, i, 255);
-    //   }
-    // }
 
     void setSpeedometerNeedleOffset() {
       int offsetColour = colour + 383; // 255 * 1.5 ~= 383
@@ -355,7 +345,7 @@ class LED {
         setAllFromCurrentState();
         show();
 
-        lastUpdateMillis = millis(); // TODO: why not move this into the isReadyToUpdate() function?
+        lastUpdateMillis = millis();
       }
     }
 
@@ -531,8 +521,6 @@ class LED {
       }
       // Kill Switch //
 
-      // TODO: handle dimmer while starting up
-
       // Prevent flash before engine starts
       delay(1000);
 
@@ -666,8 +654,6 @@ void setup() {
   Serial.begin(9600);
   randomSeed(analogRead(A3));
 
-  // Serial.println("starting up");
-
   // Init Detectors
   lightBarCallback(false);
   bumperLightCallback(false);
@@ -695,9 +681,7 @@ void setup() {
   // Run Startup Animation
   dimmer.handleState();
   killSwitch.handleInput();
-  led.startupAnimation();
-  
-  // Serial.println("startup complete");
+  led.startupAnimation(); 
 }
 
 void loop() {
@@ -707,6 +691,5 @@ void loop() {
   bumperLightDetector.handleState();
   dimmer.handleState();
   led.update();
-  // Serial.println("running");
 }
 // ARDUINO //
